@@ -13,7 +13,14 @@ let mainWindow
 
 
 const createMainWindow = async () => {
-    mainWindow = await createWindow("/index.html")
+    mainWindow = await createWindow("/index.html", {
+        bw: {
+            minWidth: 800,
+            minHeight: 630,
+            width: 800,
+            height: 610
+        }
+    })
     mainWindow.on("closed", () => {
         mainWindow = null
     })

@@ -1,29 +1,34 @@
 <template lang="pug">
 
     v-app
-        v-app-bar(
+        v-navigation-drawer.elevation-2(
             color="primary"
+            mini-variant
+            permanent
             app
         )
-            v-spacer
-            v-btn(
-                @click="dark = !dark"
-                icon
-            )
-                v-icon {{ dark ? "nights_stay" : "wb_sunny" }}
+            v-list(dense)
+                v-list-item(@click="dark = !dark")
+                    v-list-item-icon
+                        v-icon {{ dark ? "nights_stay" : "wb_sunny" }}
+                    v-list-item-content
         v-content
-            v-container.fill-height(fluid)
-                v-row
-                    v-col.text-center
-                        .display-3 Multicurrency
-                        .display-2 Calculator
+            v-container.py-0.fill-height(fluid)
+                v-row.fill-height
+                    v-col.pr-2(cols="6")
+                        app-currency-editor
 
 </template>
 
 
 <script>
 
+    import AppCurrencyEditor from "@/components/currency-editor.vue"
+
     export default {
+        components: {
+            AppCurrencyEditor
+        },
         computed: {
             ...vp.sync("settings", ["dark"]),
             settings: vp.get("settings")
