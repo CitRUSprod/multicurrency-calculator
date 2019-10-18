@@ -33,16 +33,11 @@
                         )
                             component(:is="btn.icon ? 'v-icon' : 'span'") {{ btn.text }}
             .mt-3
-                v-sheet.elevation-2.v-overflow-btn--segmented.overflow-hidden
-                    v-overflow-btn.ma-0(
-                        :items="currencies"
-                        label="Currency"
-                        hide-details
-                        editable
-                    )
-                        template(v-slot:item="{ item }")
-                            v-divider(v-if="item.disabled")
-                            b(v-else) {{ item.text }}
+                app-search-menu(
+                    label="Currency"
+                    :items="currencies"
+                    v-model="currency"
+                )
             .mt-5
                 v-text-field(
                     label="Note"
@@ -62,7 +57,12 @@
 
 <script>
 
+    import AppSearchMenu from "@/components/search-menu.vue"
+
     export default {
+        components: {
+            AppSearchMenu
+        },
         data() {
             return {
                 numberStr: "0",
@@ -138,6 +138,7 @@
                         }
                     ]
                 ],
+                currency: null,
                 currencies: [
                     {
                         text: "USD",
