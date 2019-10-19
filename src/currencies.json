@@ -1,0 +1,21 @@
+{
+    "fiat": [
+        "USD",
+        "EUR",
+        "RUB"
+    ],
+    "crypto": [
+        "BTC",
+        "ETH",
+        "XRP",
+        "TRX",
+        "XLM",
+        "EOS",
+        "DASH",
+        "USDT",
+        "ETC",
+        "LTC",
+        "BCH",
+        "PAX"
+    ]
+}
