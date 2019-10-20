@@ -60,7 +60,8 @@
         },
         computed: {
             ...vp.get("currencies", {
-                currencies: "list"
+                currencies: "list",
+                rates: "rates"
             }),
             ...vp.sync("currencies", ["wallets"]),
             sum() {

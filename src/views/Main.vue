@@ -34,6 +34,7 @@
             AppCalculationList
         },
         computed: {
+            ...vp.sync("currencies", ["rates"]),
             ...vp.sync("settings", ["dark"]),
             settings: vp.get("settings")
         },
@@ -60,10 +61,19 @@
                 } else {
                     console.error(res.error)
                 }
+            },
+            async getRates() {
+                const res = await msgRequest("get-rates")
+                if (res.success) {
+                    this.rates = res.result
+                } else {
+                    console.error(res.error)
+                }
             }
         },
         async mounted() {
             await this.getSettings()
+            await this.getRates()
         }
     }
     

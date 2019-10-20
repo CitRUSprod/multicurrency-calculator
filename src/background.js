@@ -1,6 +1,8 @@
 import { app } from "electron"
+import axios from "axios"
 
 import { createWindow, createStorage, msgServe } from "./init/main"
+import currencies from "./currencies"
 
 
 app.setName("Multicurrency Calculator")
@@ -38,4 +40,15 @@ msgServe("get-settings", async () => {
 
 msgServe("set-settings", async settings => {
     await storageData.setJson("settings.json", settings)
+})
+
+
+msgServe("get-rates", async () => {
+    const res = await axios.get("https://min-api.cryptocompare.com/data/pricemulti", {
+        params: {
+            fsyms: "USD",
+            tsyms: [...currencies.fiat, ...currencies.crypto].join(",")
+        }
+    })
+    return res.data.USD
 })

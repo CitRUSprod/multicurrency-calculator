@@ -1,13 +1,14 @@
 import currencies from "@/currencies"
 
 
-const walletsState = {
-    wallets: []
+const stateForMutations = {
+    wallets: [],
+    rates: {}
 }
 
 
 const state = {
-    ...walletsState,
+    ...stateForMutations,
     list: [
         {
             text: "Fiat",
@@ -31,7 +32,7 @@ const state = {
 }
 
 
-const mutations = vp.make.mutations(walletsState)
+const mutations = vp.make.mutations(stateForMutations)
 
 
 export default {
