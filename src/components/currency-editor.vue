@@ -187,11 +187,3 @@
     }
 
 </script>
-
-
-<style lang="sass">
-
-    .overflow-hidden
-        overflow: hidden
-
-</style>

@@ -17,6 +17,8 @@
                 v-row.fill-height
                     v-col.pr-2(cols="6")
                         app-currency-editor
+                    v-col.pl-2(cols="6")
+                        app-calculation-list
 
 </template>
 
@@ -24,10 +26,12 @@
 <script>
 
     import AppCurrencyEditor from "@/components/currency-editor.vue"
+    import AppCalculationList from "@/components/calculation-list.vue"
 
     export default {
         components: {
-            AppCurrencyEditor
+            AppCurrencyEditor,
+            AppCalculationList
         },
         computed: {
             ...vp.sync("settings", ["dark"]),
