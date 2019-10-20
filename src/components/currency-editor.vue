@@ -142,9 +142,10 @@
             }
         },
         computed: {
-            ...vp.sync("currencies", {
+            ...vp.get("currencies", {
                 currencies: "list"
             }),
+            ...vp.sync("currencies", ["wallets"]),
             number: {
                 get() {
                     return this.numberStr
@@ -181,7 +182,17 @@
                 this.number = this.number.substr(0, this.number.length - 1)
             },
             add() {
+                let number = +this.number.replace(",", ".")
+                if (!this.sign) number *= -1
+                const wallet = {
+                    number,
+                    currency: this.currency,
+                    note: this.note
+                }
+                this.wallets.push(wallet)
 
+                this.number = 0
+                this.note = ""
             }
         }
     }

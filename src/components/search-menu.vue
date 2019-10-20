@@ -9,6 +9,7 @@
         v-model="chosen"
         @focus="focused = true"
         @blur="focused = false"
+        return-object
         hide-details
         solo
     )
@@ -85,7 +86,7 @@
         methods: {
             selectFirst() {
                 const items = _.reject(this.formattedItems, { title: true })
-                if (items.length) this.chosen = items[0].value
+                if (items.length) this.chosen = items[0]
             },
             customFilter(item, search) {
                 if (item.title) {

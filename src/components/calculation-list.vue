@@ -8,17 +8,19 @@
                     height="100%"
                 )
                     v-card-text.fill-height
-                        v-sheet.pa-4.scrollable(height="100%")
-                            v-card(
-                                v-for="term, index in terms"
-                                :key="index"
-                                :class="{ 'mb-2': index + 1 !== terms.length }"
-                                color="success"
-                            )
-                                v-card-text
-                                    b {{ term.number }} {{ term.currency.text }}
-                                    br
-                                    span {{ term.note }}
+                        v-sheet.scrollable(height="100%")
+                            v-card-text
+                                v-card(
+                                    v-for="wallet, index in wallets"
+                                    :key="index"
+                                    :class="{ 'mb-2': index + 1 !== wallets.length }"
+                                    color="success"
+                                )
+                                    v-card-text
+                                        b {{ wallet.number }} {{ wallet.currency.text }}
+                                        template(v-if="!!wallet.note")
+                                            br
+                                            span {{ wallet.note }}
             div
                 v-card(
                     color="primary"
@@ -53,31 +55,14 @@
         },
         data() {
             return {
-                currency: null,
-                terms: [
-                    {
-                        number: 150,
-                        currency: {
-                            text: "USD",
-                            value: "usd"
-                        },
-                        note: "Visa"
-                    },
-                    {
-                        number: 39.95,
-                        currency: {
-                            text: "EUR",
-                            value: "eur"
-                        },
-                        note: "MasterCard"
-                    }
-                ]
+                currency: null
             }
         },
         computed: {
-            ...vp.sync("currencies", {
+            ...vp.get("currencies", {
                 currencies: "list"
             }),
+            ...vp.sync("currencies", ["wallets"]),
             sum() {
                 return 0
             }
