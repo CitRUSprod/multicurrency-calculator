@@ -68,6 +68,7 @@
                 numberStr: "0",
                 sign: true,
                 note: "",
+                currency: null,
                 buttons: [
                     [
                         {
@@ -137,56 +138,13 @@
                             click: () => this.removeSymbol()
                         }
                     ]
-                ],
-                currency: null,
-                currencies: [
-                    {
-                        text: "USD",
-                        value: "usd"
-                    },
-                    {
-                        text: "EUR",
-                        value: "eur"
-                    },
-                    {
-                        text: "RUB",
-                        value: "rub"
-                    },
-                    {
-                        disabled: true
-                    },
-                    {
-                        text: "BTC",
-                        value: "btc"
-                    },
-                    {
-                        text: "ETH",
-                        value: "eth"
-                    },
-                    {
-                        text: "LTC",
-                        value: "ltc"
-                    },
-                    {
-                        text: "ETC",
-                        value: "etc"
-                    },
-                    {
-                        text: "BCH",
-                        value: "bch"
-                    },
-                    {
-                        text: "EOS",
-                        value: "eos"
-                    },
-                    {
-                        text: "TRX",
-                        value: "trx"
-                    }
                 ]
             }
         },
         computed: {
+            ...vp.sync("currencies", {
+                currencies: "list"
+            }),
             number: {
                 get() {
                     return this.numberStr

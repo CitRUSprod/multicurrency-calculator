@@ -1,16 +1,20 @@
 <template lang="pug">
     
-    v-sheet.elevation-2.v-overflow-btn--segmented.overflow-hidden
-        v-overflow-btn.ma-0(
-            :items="items"
-            :label="label"
-            v-model="value"
-            hide-details
-            editable
-        )
-            template(v-slot:item="{ item }")
-                v-divider(v-if="item.disabled")
-                b(v-else) {{ item.text }}
+    v-autocomplete(
+        :items="formattedItems"
+        :label="label"
+        :search-input.sync="search"
+        :menu-props="{ closeOnContentClick: true }"
+        :filter="customFilter"
+        v-model="chosen"
+        @focus="focused = true"
+        @blur="focused = false"
+        hide-details
+        solo
+    )
+        template(v-slot:item="{ item }")
+            b(v-if="item.title") {{ item.text }}
+            span.pl-4(v-else) {{ item.text }}
 
 </template>
 
@@ -18,16 +22,82 @@
 <script>
 
     export default {
-        props: ["items", "label"],
+        props: ["value", "items", "label"],
         data() {
             return {
-                value: null
+                search: "",
+                focused: false
+            }
+        },
+        computed: {
+            chosen: {
+                get() {
+                    return this.value
+                },
+                set(v) {
+                    this.$emit("input", v)
+                }
+            },
+            groups() {
+                let groups = {}
+                for (const item of this.items) {
+                    if (item.group) {
+                        if (this.focused) {
+                            groups[item.value] = _.filter(item.elements, el => {
+                                const text = el.text.toLowerCase()
+                                const search = this.search.toLowerCase()
+                                return !!~text.indexOf(search)
+                            })
+                        } else {
+                            groups[item.value] = item.elements
+                        }
+                    }
+                }
+                return groups
+            },
+            formattedItems() {
+                if (_.isArray(this.items)) {
+                    let items = []
+                    for (const item of this.items) {
+                        if (item.group) {
+                            items.push({
+                                title: true,
+                                text: item.text,
+                                value: item.value,
+                                disabled: true
+                            })
+                            items.push(...item.elements)
+                        } else {
+                            items.push(item)
+                        }
+                    }
+                    return items
+                } else {
+                    return []
+                }
             }
         },
         watch: {
-            value(v) {
-                this.$emit("input", v)
+            focused(v) {
+                if (!v && !this.chosen) this.selectFirst()
             }
+        },
+        methods: {
+            selectFirst() {
+                const items = _.reject(this.formattedItems, { title: true })
+                if (items.length) this.chosen = items[0].value
+            },
+            customFilter(item, search) {
+                if (item.title) {
+                    return !!this.groups[item.value].length
+                } else {
+                    const text = item.text.toLowerCase()
+                    return !!~text.indexOf(search.toLowerCase())
+                }
+            }
+        },
+        mounted() {
+            if (!this.chosen) this.selectFirst()
         }
     }
 
