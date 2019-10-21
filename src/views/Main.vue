@@ -16,7 +16,7 @@
             v-container.py-0.fill-height(fluid)
                 v-row.fill-height
                     v-col.pr-2(cols="6")
-                        app-currency-editor
+                        app-wallet-editor
                     v-col.pl-2(cols="6")
                         app-calculation-list
 
@@ -25,12 +25,12 @@
 
 <script>
 
-    import AppCurrencyEditor from "@/components/currency-editor.vue"
+    import AppWalletEditor from "@/components/wallet-editor.vue"
     import AppCalculationList from "@/components/calculation-list.vue"
 
     export default {
         components: {
-            AppCurrencyEditor,
+            AppWalletEditor,
             AppCalculationList
         },
         computed: {
