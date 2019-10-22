@@ -8,7 +8,7 @@
                     height="100%"
                 )
                     v-card-text.fill-height
-                        v-sheet.scrollable(height="100%")
+                        v-card.scrollable(height="100%")
                             v-card-text
                                 v-card(
                                     v-for="wallet, index in wallets"
@@ -17,7 +17,7 @@
                                     color="success"
                                 )
                                     v-card-text
-                                        b {{ wallet.number }} {{ wallet.currency.text }}
+                                        b {{ wallet.amount }} {{ wallet.currency.text }}
                                         template(v-if="!!wallet.note")
                                             br
                                             span {{ wallet.note }}
@@ -28,14 +28,22 @@
                 )
                     v-card-text
                         v-row(no-gutters)
-                            v-col.pr-1(cols="8")
+                            v-col(cols="12")
                                 v-text-field.title(
                                     v-model="sum"
                                     hide-details
                                     readonly
                                     solo
                                 )
-                            v-col(cols="4")
+                        v-row.mt-2(no-gutters)
+                            v-col.pr-1(cols="6")
+                                v-text-field.title(
+                                    label="Precision"
+                                    v-model.number="precision"
+                                    hide-details
+                                    solo
+                                )
+                            v-col.pl-1(cols="6")
                                 app-search-menu(
                                     label="Currency"
                                     :items="currencies"
@@ -47,7 +55,11 @@
 
 <script>
 
+    import Decimal from "decimal.js-light"
+
+    import Converter from "@/libs/converter"
     import AppSearchMenu from "@/components/search-menu.vue"
+
 
     export default {
         components: {
@@ -55,6 +67,7 @@
         },
         data() {
             return {
+                precision: 4,
                 currency: null
             }
         },
@@ -65,7 +78,21 @@
             }),
             ...vp.sync("currencies", ["wallets"]),
             sum() {
-                return 0
+                if (this.currency) {
+                    let sum = new Decimal(0)
+
+                    for (const wallet of this.wallets) {
+                        const converter = new Converter({
+                            amount: wallet.amount,
+                            currency: wallet.currency.text
+                        }, this.rates)
+                        sum = sum.add(converter[this.currency.text])
+                    }
+
+                    return _.round(sum.toNumber(), this.precision)
+                } else {
+                    return 0
+                }
             }
         }
     }

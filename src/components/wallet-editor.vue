@@ -7,7 +7,7 @@
         v-card-text
             div
                 v-text-field.mb-3.display-1(
-                    v-model="number"
+                    v-model="amount"
                     :append-icon="sign ? 'control_point' : 'remove_circle_outline'"
                     @click:append="sign = !sign"
                     hide-details
@@ -59,13 +59,14 @@
 
     import AppSearchMenu from "@/components/search-menu.vue"
 
+
     export default {
         components: {
             AppSearchMenu
         },
         data() {
             return {
-                numberStr: "0",
+                amountStr: "0",
                 sign: true,
                 note: "",
                 currency: null,
@@ -146,28 +147,28 @@
                 currencies: "list"
             }),
             ...vp.sync("currencies", ["wallets"]),
-            number: {
+            amount: {
                 get() {
-                    return this.numberStr
+                    return this.amountStr
                 },
                 set(v) {
                     if (!_.isString(v) || !v) {
-                        this.numberStr = "0"
+                        this.amountStr = "0"
                     } else {
                         if (v.replace(/[^,]/g, "").length <= 1) {
                             if (v[0] === "0" && v.length > 1) {
                                 const str = v.replace(/^0*/, "")
                                 if (str.length) {
                                     if (str[0] === ",") {
-                                        this.numberStr = `0${str}`
+                                        this.amountStr = `0${str}`
                                     } else {
-                                        this.numberStr = str
+                                        this.amountStr = str
                                     }
                                 } else {
-                                    this.numberStr = "0"
+                                    this.amountStr = "0"
                                 }
                             } else {
-                                this.numberStr = v
+                                this.amountStr = v
                             }
                         }
                     }
@@ -176,22 +177,22 @@
         },
         methods: {
             addSymbol(symbol) {
-                this.number += symbol
+                this.amount += symbol
             },
             removeSymbol() {
-                this.number = this.number.substr(0, this.number.length - 1)
+                this.amount = this.amount.substr(0, this.amount.length - 1)
             },
             add() {
-                let number = +this.number.replace(",", ".")
-                if (!this.sign) number *= -1
+                let amount = +this.amount.replace(",", ".")
+                if (!this.sign) amount *= -1
                 const wallet = {
-                    number,
+                    amount,
                     currency: this.currency,
                     note: this.note
                 }
                 this.wallets.push(wallet)
 
-                this.number = 0
+                this.amount = 0
                 this.note = ""
             }
         }
