@@ -37,6 +37,7 @@
                     label="Currency"
                     :items="currencies"
                     v-model="currency"
+                    solo
                 )
             .mt-5
                 v-text-field(

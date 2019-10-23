@@ -1,6 +1,39 @@
 <template lang="pug">
     
     .calculation-list
+        v-dialog(
+            max-width="300"
+            v-model="resultSettings.dialog"
+            persistent
+        )
+            v-card
+                v-card-title.headline.primary.white--text Result settings
+                v-card-text
+                    v-row
+                        v-col(cols="12")
+                            v-text-field.title(
+                                label="Precision"
+                                v-model.number="resultSettings.precision"
+                                hide-details
+                            )
+                        v-col(cols="12")
+                            app-search-menu(
+                                label="Currency"
+                                :items="currencies"
+                                v-model="resultSettings.currency"
+                            )
+                v-card-actions
+                    v-spacer
+                    v-btn(
+                        color="success"
+                        @click="saveResultSettings"
+                        text
+                    ) Save
+                    v-btn(
+                        color="error"
+                        @click="cancelResultSettings"
+                        text
+                    ) Cancel
         .inner
             .pb-4
                 v-card(
@@ -27,28 +60,20 @@
                     height="100%"
                 )
                     v-card-text
-                        v-row(no-gutters)
-                            v-col(cols="12")
-                                v-text-field.title(
-                                    v-model="sum"
-                                    hide-details
-                                    readonly
-                                    solo
-                                )
-                        v-row.mt-2(no-gutters)
-                            v-col.pr-1(cols="6")
-                                v-text-field.title(
-                                    label="Precision"
-                                    v-model.number="precision"
-                                    hide-details
-                                    solo
-                                )
-                            v-col.pl-1(cols="6")
-                                app-search-menu(
-                                    label="Currency"
-                                    :items="currencies"
-                                    v-model="currency"
-                                )
+                        v-text-field.title(
+                            append-icon="settings"
+                            :prefix="currency ? `${currency.text} ` : void 0"
+                            v-model="sum"
+                            @click:append="resultSettings.dialog = true"
+                            hide-details
+                            readonly
+                            solo
+                        )
+                        app-search-menu(
+                            :items="currencies"
+                            v-model="currency"
+                            style="display:none"
+                        )
 
 </template>
 
@@ -67,11 +92,15 @@
         },
         data() {
             return {
-                precision: 4,
-                currency: null
+                resultSettings: {
+                    dialog: false,
+                    precision: 4,
+                    currency: null
+                }
             }
         },
         computed: {
+            ...vp.sync("settings", ["precision", "currency"]),
             ...vp.get("currencies", {
                 currencies: "list",
                 rates: "rates"
@@ -94,6 +123,26 @@
                     return 0
                 }
             }
+        },
+        watch: {
+            precision(v) {
+                this.resultSettings.precision = v
+            },
+            currency(v) {
+                this.resultSettings.currency = v
+            }
+        },
+        methods: {
+            saveResultSettings() {
+                this.precision = this.resultSettings.precision
+                this.currency = this.resultSettings.currency
+                this.resultSettings.dialog = false
+            },
+            cancelResultSettings() {
+                this.resultSettings.precision = this.precision
+                this.resultSettings.currency = this.currency
+                this.resultSettings.dialog = false
+            }
         }
     }
 
@@ -113,10 +162,10 @@
             grid-template-rows: minmax(0, 1fr) auto
             height: 100%
 
-        .scrollable
-            overflow-y: auto
+            .scrollable
+                overflow-y: auto
 
-            &::-webkit-scrollbar
-                display: none
+                &::-webkit-scrollbar
+                    display: none
 
 </style>

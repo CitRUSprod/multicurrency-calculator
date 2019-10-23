@@ -35,7 +35,7 @@
         },
         computed: {
             ...vp.sync("currencies", ["rates"]),
-            ...vp.sync("settings", ["dark"]),
+            ...vp.sync("settings", ["dark", "precision", "currency"]),
             settings: vp.get("settings")
         },
         watch: {
@@ -56,8 +56,10 @@
             async getSettings() {
                 const res = await msgRequest("get-settings")
                 if (res.success) {
-                    const { dark } = res.result
+                    const { dark, precision, currency } = res.result
                     if (!_.isNil(dark)) this.dark = dark
+                    if (!_.isNil(precision)) this.precision = precision
+                    if (!_.isNil(currency)) this.currency = currency
                 } else {
                     console.error(res.error)
                 }
