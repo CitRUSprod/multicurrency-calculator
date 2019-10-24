@@ -193,6 +193,7 @@
                 }
                 this.wallets.push(wallet)
 
+                this.sign = true
                 this.amount = 0
                 this.note = ""
             }

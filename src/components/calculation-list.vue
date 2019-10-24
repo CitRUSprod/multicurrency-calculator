@@ -50,10 +50,18 @@
                                     color="success"
                                 )
                                     v-card-text
-                                        b {{ wallet.amount }} {{ wallet.currency.text }}
-                                        template(v-if="!!wallet.note")
-                                            br
-                                            span {{ wallet.note }}
+                                        .wallet
+                                            div
+                                                b {{ wallet.amount }} {{ wallet.currency.text }}
+                                                template(v-if="!!wallet.note")
+                                                    br
+                                                    span {{ wallet.note }}
+                                            .control
+                                                div
+                                                    v-icon(
+                                                        @click="removeWallet(index)"
+                                                        small
+                                                    ) delete
             div
                 v-card(
                     color="primary"
@@ -142,6 +150,9 @@
                 this.resultSettings.precision = this.precision
                 this.resultSettings.currency = this.currency
                 this.resultSettings.dialog = false
+            },
+            removeWallet(index) {
+                this.wallets.splice(index, 1)
             }
         }
     }
@@ -167,5 +178,13 @@
 
                 &::-webkit-scrollbar
                     display: none
+
+            .wallet
+                display: flex
+                justify-content: space-between
+
+                > .control
+                    display: flex
+                    align-items: center
 
 </style>
