@@ -49,6 +49,7 @@
         v-card-actions.px-4
             v-btn(
                 color="success"
+                :disabled="!amountNum"
                 @click="add"
                 block
             ) Add
@@ -174,6 +175,9 @@
                         }
                     }
                 }
+            },
+            amountNum() {
+                return +this.amount.replace(",", ".")
             }
         },
         methods: {
@@ -184,7 +188,7 @@
                 this.amount = this.amount.substr(0, this.amount.length - 1)
             },
             add() {
-                let amount = +this.amount.replace(",", ".")
+                let amount = this.amountNum
                 if (!this.sign) amount *= -1
                 const wallet = {
                     amount,

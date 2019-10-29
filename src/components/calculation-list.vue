@@ -11,16 +11,17 @@
                 v-card-text
                     v-row
                         v-col(cols="12")
-                            v-text-field.title(
-                                label="Precision"
-                                v-model.number="resultSettings.precision"
-                                hide-details
-                            )
-                        v-col(cols="12")
                             app-search-menu(
                                 label="Currency"
                                 :items="currencies"
                                 v-model="resultSettings.currency"
+                            )
+                    v-row
+                        v-col(cols="12")
+                            v-text-field.title(
+                                label="Precision"
+                                v-model.number="resultSettings.precision"
+                                hide-details
                             )
                 v-card-actions
                     v-spacer

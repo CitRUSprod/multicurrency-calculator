@@ -1,6 +1,38 @@
 <template lang="pug">
 
     v-app
+        v-dialog(
+            max-width="300"
+            v-model="ratesDialog"
+            persistent
+            scrollable
+        )
+            v-card
+                v-card-title.headline.primary.white--text Rates
+                v-card-text
+                    v-list(subheader)
+                        v-subheader Fiat
+                        v-list-item(
+                            v-for="curr, index in currencies[0].elements"
+                            :key="index"
+                        )
+                            v-list-item-content
+                                v-list-item-title 1 USD = {{ rates[curr.text] }} {{ curr.text }}
+                    v-list(subheader)
+                        v-subheader Crypto
+                        v-list-item(
+                            v-for="curr, index in currencies[1].elements"
+                            :key="index"
+                        )
+                            v-list-item-content
+                                v-list-item-title 1 USD = {{ rates[curr.text] }} {{ curr.text }}
+                v-card-actions
+                    v-spacer
+                    v-btn(
+                        color="error"
+                        @click="ratesDialog = false"
+                        text
+                    ) Close
         v-navigation-drawer.elevation-2(
             color="primary"
             mini-variant
@@ -8,10 +40,16 @@
             app
         )
             v-list(dense)
-                v-list-item(@click="dark = !dark")
-                    v-list-item-icon
-                        v-icon {{ dark ? "nights_stay" : "wb_sunny" }}
-                    v-list-item-content
+                app-list-item(
+                    tooltip="Theme"
+                    :icon="dark ? 'nights_stay' : 'wb_sunny'"
+                    :click="() => { dark = !dark }"
+                )
+                app-list-item(
+                    tooltip="Rates"
+                    icon="attach_money"
+                    :click="() => { ratesDialog = true }"
+                )
         v-content
             v-container.py-0.fill-height(fluid)
                 v-row.fill-height
@@ -27,14 +65,24 @@
 
     import AppWalletEditor from "@/components/wallet-editor.vue"
     import AppCalculationList from "@/components/calculation-list.vue"
+    import AppListItem from "@/components/list-item.vue"
 
     export default {
         components: {
             AppWalletEditor,
-            AppCalculationList
+            AppCalculationList,
+            AppListItem
+        },
+        data() {
+            return {
+                ratesDialog: false
+            }
         },
         computed: {
-            ...vp.sync("currencies", ["rates"]),
+            ...vp.sync("currencies", {
+                currencies: "list",
+                rates: "rates"
+            }),
             ...vp.sync("settings", ["dark", "precision", "currency"]),
             settings: vp.get("settings")
         },
