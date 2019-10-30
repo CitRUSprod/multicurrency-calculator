@@ -48,7 +48,7 @@
                                     v-for="wallet, index in wallets"
                                     :key="index"
                                     :class="{ 'mb-2': index + 1 !== wallets.length }"
-                                    color="success"
+                                    :color="wallet.sign ? 'success' : 'error'"
                                 )
                                     v-card-text
                                         .wallet
@@ -58,7 +58,11 @@
                                                     br
                                                     span {{ wallet.note }}
                                             .control
-                                                div
+                                                div(v-if="!editingMode")
+                                                    v-icon.mr-1(
+                                                        @click="editWallet(index)"
+                                                        small
+                                                    ) edit
                                                     v-icon(
                                                         @click="removeWallet(index)"
                                                         small
@@ -115,6 +119,10 @@
                 rates: "rates"
             }),
             ...vp.sync("currencies", ["wallets"]),
+            ...vp.sync("editing", {
+                editingMode: "mode",
+                editingParams: "params"
+            }),
             sum() {
                 if (this.currency) {
                     let sum = new Decimal(0)
@@ -124,7 +132,12 @@
                             amount: wallet.amount,
                             currency: wallet.currency.text
                         }, this.rates)
-                        sum = sum.add(converter[this.currency.text])
+                        const amount = converter[this.currency.text]
+                        if (wallet.sign) {
+                            sum = sum.add(amount)
+                        } else {
+                            sum = sum.sub(amount)
+                        }
                     }
 
                     return _.round(sum.toNumber(), this.precision)
@@ -139,6 +152,24 @@
             },
             currency(v) {
                 this.resultSettings.currency = v
+            },
+            editingMode(v) {
+                if (!v && _.isNumber(this.editingParams.index)) {
+                    const { index, sign, amount, currency, note } = _.cloneDeep(this.editingParams)
+                    const wallet = { sign, amount, currency, note }
+                    if (!_.isEqual(this.wallets[index], wallet)) {
+                        const wallets = _.cloneDeep(this.wallets)
+                        wallets[index] = wallet
+                        this.wallets = wallets
+                        this.editingParams = {
+                            index: null,
+                            sign: null,
+                            amount: null,
+                            currency: null,
+                            note: null
+                        }
+                    }
+                }
             }
         },
         methods: {
@@ -151,6 +182,12 @@
                 this.resultSettings.precision = this.precision
                 this.resultSettings.currency = this.currency
                 this.resultSettings.dialog = false
+            },
+            editWallet(index) {
+                const wallet = _.cloneDeep(this.wallets[index])
+                wallet.index = index
+                this.editingParams = wallet
+                this.editingMode = true
             },
             removeWallet(index) {
                 this.wallets.splice(index, 1)

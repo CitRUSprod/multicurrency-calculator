@@ -18,7 +18,7 @@ const createMainWindow = async () => {
     mainWindow = await createWindow("/index.html", {
         bw: {
             width: 800,
-            height: 610,
+            height: 646,
             resizable: false
         }
     })

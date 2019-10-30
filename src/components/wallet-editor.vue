@@ -6,6 +6,10 @@
     )
         v-card-text
             div
+                .headline {{ editingMode ? "Editing mode" : "Add mode" }}
+            .mt-2.mb-4
+                v-divider
+            div
                 v-text-field.mb-3.display-1(
                     v-model="amount"
                     :append-icon="sign ? 'control_point' : 'remove_circle_outline'"
@@ -39,20 +43,38 @@
                     v-model="currency"
                     solo
                 )
-            .mt-5
+            .mt-4
                 v-text-field(
                     label="Note"
                     v-model.trim="note"
                     hide-details
                     solo
                 )
-        v-card-actions.px-4
-            v-btn(
-                color="success"
-                :disabled="!amountNum"
-                @click="add"
-                block
-            ) Add
+            .mt-4
+                v-row(
+                    v-if="editingMode"
+                    no-gutters
+                )
+                    v-col.pr-2(cols="6")
+                        v-btn(
+                            color="success"
+                            :disabled="!amountNum"
+                            @click="editWallet"
+                            block
+                        ) Edit
+                    v-col.pl-2(cols="6")
+                        v-btn(
+                            color="error"
+                            @click="cancelEditWallet"
+                            block
+                        ) Cancel
+                v-btn(
+                    v-else
+                    color="success"
+                    :disabled="!amountNum"
+                    @click="addWallet"
+                    block
+                ) Add
 
 </template>
 
@@ -149,6 +171,10 @@
                 currencies: "list"
             }),
             ...vp.sync("currencies", ["wallets"]),
+            ...vp.sync("editing", {
+                editingMode: "mode",
+                editingParams: "params"
+            }),
             amount: {
                 get() {
                     return this.amountStr
@@ -180,6 +206,17 @@
                 return +this.amount.replace(",", ".")
             }
         },
+        watch: {
+            editingMode(v) {
+                if (v) {
+                    const { sign, amount, currency, note } = this.editingParams
+                    this.sign = sign
+                    this.amount = amount.toString().replace(".", ",")
+                    this.currency = currency
+                    this.note = note
+                }
+            }
+        },
         methods: {
             addSymbol(symbol) {
                 this.amount += symbol
@@ -187,19 +224,36 @@
             removeSymbol() {
                 this.amount = this.amount.substr(0, this.amount.length - 1)
             },
-            add() {
-                let amount = this.amountNum
-                if (!this.sign) amount *= -1
+            setDefaultValues() {
+                this.sign = true
+                this.amount = 0
+                this.note = ""
+            },
+            addWallet() {
                 const wallet = {
-                    amount,
+                    sign: this.sign,
+                    amount: this.amountNum,
                     currency: this.currency,
                     note: this.note
                 }
                 this.wallets.push(wallet)
-
-                this.sign = true
-                this.amount = 0
-                this.note = ""
+                this.setDefaultValues()
+            },
+            editWallet() {
+                const { index } = this.editingParams
+                this.editingParams = {
+                    index,
+                    sign: this.sign,
+                    amount: this.amountNum,
+                    currency: this.currency,
+                    note: this.note
+                }
+                this.editingMode = false
+                this.setDefaultValues()
+            },
+            cancelEditWallet() {
+                this.editingMode = false
+                this.setDefaultValues()
             }
         }
     }
