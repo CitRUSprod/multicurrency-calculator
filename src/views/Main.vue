@@ -15,6 +15,7 @@
                         v-list-item(
                             v-for="curr, index in currencies[0].elements"
                             :key="index"
+                            v-if="curr.value !== 'usd'"
                         )
                             v-list-item-content
                                 v-list-item-title 1 USD = {{ rates[curr.text] }} {{ curr.text }}
@@ -29,7 +30,14 @@
                 v-card-actions
                     v-spacer
                     v-btn(
+                        color="success"
+                        :loading="gettingRates"
+                        @click="getRates"
+                        text
+                    ) Update
+                    v-btn(
                         color="error"
+                        :loading="gettingRates"
                         @click="ratesDialog = false"
                         text
                     ) Close
@@ -75,6 +83,7 @@
         },
         data() {
             return {
+                gettingRates: false,
                 ratesDialog: false
             }
         },
@@ -113,12 +122,14 @@
                 }
             },
             async getRates() {
+                this.gettingRates = true
                 const res = await msgRequest("get-rates")
                 if (res.success) {
                     this.rates = res.result
                 } else {
                     console.error(res.error)
                 }
+                this.gettingRates = false
             }
         },
         async mounted() {
