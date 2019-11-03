@@ -12,7 +12,7 @@
             div
                 v-text-field.mb-3.display-1(
                     v-model="amount"
-                    :append-icon="sign ? 'control_point' : 'remove_circle_outline'"
+                    :append-icon="sign ? 'fas fa-plus' : 'fas fa-minus'"
                     @click:append="sign = !sign"
                     hide-details
                     readonly
@@ -158,7 +158,7 @@
                             click: () => this.addSymbol("0")
                         },
                         {
-                            text: "backspace",
+                            text: "fas fa-backspace",
                             icon: true,
                             click: () => this.removeSymbol()
                         }

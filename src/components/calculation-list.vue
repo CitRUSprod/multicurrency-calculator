@@ -57,16 +57,16 @@
                                                 .caption.font-italic(v-if="!!wallet.note") {{ wallet.note }}
                                             .control.pl-2
                                                 div
-                                                    v-icon.mr-1(
+                                                    v-icon.mr-2(
                                                         :disabled="editingMode"
                                                         @click="editWallet(index)"
                                                         small
-                                                    ) edit
+                                                    ) fas fa-pen
                                                     v-icon(
                                                         :disabled="editingMode"
                                                         @click="removeWallet(index)"
                                                         small
-                                                    ) delete
+                                                    ) fas fa-trash
             div
                 v-card(
                     color="primary"
@@ -74,7 +74,7 @@
                 )
                     v-card-text
                         v-text-field.title(
-                            append-icon="settings"
+                            append-icon="fas fa-cog"
                             :prefix="currency ? `${currency.text} ` : void 0"
                             v-model="sum"
                             @click:append="resultSettings.dialog = true"

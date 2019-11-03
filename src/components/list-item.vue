@@ -8,7 +8,7 @@
         right
     )
         template(v-slot:activator="{ on }")
-            v-list-item(
+            v-list-item.mb-2(
                 v-on="on"
                 @click="click"
             )

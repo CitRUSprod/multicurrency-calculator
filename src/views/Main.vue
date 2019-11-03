@@ -50,12 +50,12 @@
             v-list(dense)
                 app-list-item(
                     tooltip="Theme"
-                    :icon="dark ? 'nights_stay' : 'wb_sunny'"
+                    :icon="dark ? 'fas fa-moon' : 'fas fa-sun'"
                     :click="() => { dark = !dark }"
                 )
                 app-list-item(
                     tooltip="Rates"
-                    icon="attach_money"
+                    icon="fas fa-search-dollar"
                     :click="() => { ratesDialog = true }"
                 )
         v-content
