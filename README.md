@@ -3,7 +3,7 @@
 ## Installation:
 
 ```bash
-$ git clone https://github.com/CitRUSprod/multicurrency-calculator.git multicurrency-calculator
+$ git clone https://github.com/CitRUSprod/multicurrency-calculator.git
 $ cd multicurrency-calculator
 $ yarn
 ```
