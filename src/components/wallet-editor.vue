@@ -1,6 +1,6 @@
 <template lang="pug">
 
-    v-card(
+    v-card.d-flex.flex-column.justify-space-between(
         color="primary"
         height="100%"
     )
@@ -50,31 +50,31 @@
                     hide-details
                     solo
                 )
-            .mt-4
-                v-row(
-                    v-if="editingMode"
-                    no-gutters
-                )
-                    v-col.pr-2(cols="6")
-                        v-btn(
-                            color="success"
-                            :disabled="!amountNum"
-                            @click="editWallet"
-                            block
-                        ) Edit
-                    v-col.pl-2(cols="6")
-                        v-btn(
-                            color="error"
-                            @click="cancelEditWallet"
-                            block
-                        ) Cancel
-                v-btn(
-                    v-else
-                    color="success"
-                    :disabled="!amountNum"
-                    @click="addWallet"
-                    block
-                ) Add
+        v-card-actions.px-4.pb-4
+            v-row(
+                v-if="editingMode"
+                no-gutters
+            )
+                v-col.pr-2(cols="6")
+                    v-btn(
+                        color="success"
+                        :disabled="!amountNum"
+                        @click="editWallet"
+                        block
+                    ) Edit
+                v-col.pl-2(cols="6")
+                    v-btn(
+                        color="error"
+                        @click="cancelEditWallet"
+                        block
+                    ) Cancel
+            v-btn(
+                v-else
+                color="success"
+                :disabled="!amountNum"
+                @click="addWallet"
+                block
+            ) Add
 
 </template>
 
