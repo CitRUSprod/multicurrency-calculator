@@ -48,22 +48,22 @@
                                     v-for="wallet, index in wallets"
                                     :key="index"
                                     :class="{ 'mb-2': index + 1 !== wallets.length }"
-                                    :color="wallet.sign ? 'success' : 'error'"
+                                    :color="walletColor(index, wallet.sign)"
                                 )
                                     v-card-text
                                         .wallet
-                                            div
-                                                b {{ wallet.amount }} {{ wallet.currency.text }}
-                                                template(v-if="!!wallet.note")
-                                                    br
-                                                    span {{ wallet.note }}
-                                            .control
-                                                div(v-if="!editingMode")
+                                            .information
+                                                .subtitle-1.font-weight-bold {{ wallet.amount }} {{ wallet.currency.text }}
+                                                .caption.font-italic(v-if="!!wallet.note") {{ wallet.note }}
+                                            .control.pl-2
+                                                div
                                                     v-icon.mr-1(
+                                                        :disabled="editingMode"
                                                         @click="editWallet(index)"
                                                         small
                                                     ) edit
                                                     v-icon(
+                                                        :disabled="editingMode"
                                                         @click="removeWallet(index)"
                                                         small
                                                     ) delete
@@ -191,6 +191,10 @@
             },
             removeWallet(index) {
                 this.wallets.splice(index, 1)
+            },
+            walletColor(index, sign) {
+                const color = sign ? "success" : "error"
+                return this.editingMode && index !== this.editingParams.index ? "grey" : color
             }
         }
     }
@@ -221,8 +225,12 @@
                 display: flex
                 justify-content: space-between
 
+                > .information
+                    word-break: break-word
+
                 > .control
                     display: flex
                     align-items: center
+                    white-space: nowrap
 
 </style>

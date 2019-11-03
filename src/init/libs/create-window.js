@@ -16,8 +16,6 @@ const createWindow = (url = null, options = {}) => {
         menu: false,
         waitForReadiness: true,
         bw: {
-            width: 800,
-            height: 600,
             icon: path.join(__static, "icon.png"),
             webPreferences: {
                 nodeIntegration: isLocalUrl
