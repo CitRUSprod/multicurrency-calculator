@@ -6,7 +6,7 @@
     )
         v-card-text
             div
-                .headline {{ editingMode ? "Editing mode" : "Add mode" }}
+                .title MODE: {{ editingMode ? "Wallet editing" : "Wallet adding" }}
             .mt-2.mb-4
                 v-divider
             div

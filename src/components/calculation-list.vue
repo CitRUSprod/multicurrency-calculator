@@ -43,11 +43,14 @@
                 )
                     v-card-text.fill-height
                         v-card.scrollable(height="100%")
-                            v-card-text
+                            v-card-text.fill-height
+                                .fill-height.d-flex.justify-center.align-center(v-if="!wallets.length")
+                                    .body-1.font-italic Wallet list is empty
                                 v-card(
+                                    v-else
                                     v-for="wallet, index in wallets"
                                     :key="index"
-                                    :class="{ 'mb-2': index + 1 !== wallets.length }"
+                                    :class="index + 1 === wallets.length ? 'mb-4' : 'mb-2'"
                                     :color="walletColor(index, wallet.sign)"
                                 )
                                     v-card-text
@@ -193,8 +196,11 @@
                 this.wallets.splice(index, 1)
             },
             walletColor(index, sign) {
-                const color = sign ? "success" : "error"
-                return this.editingMode && index !== this.editingParams.index ? "grey" : color
+                if (this.editingMode && index !== this.editingParams.index) {
+                    return sign ? "grey" : "grey darken-1"
+                } else {
+                    return sign ? "success" : "error"
+                }
             }
         }
     }
