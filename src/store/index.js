@@ -3,7 +3,7 @@ import Vuex from "vuex"
 
 import settings from "./modules/settings"
 import currencies from "./modules/currencies"
-import editing from "./modules/editing"
+import cp from "./modules/control-panel"
 
 
 Vue.use(Vuex)
@@ -11,5 +11,5 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     plugins: [vp.default.plugin],
-    modules: { settings, currencies, editing }
+    modules: { settings, currencies, cp }
 })

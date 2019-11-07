@@ -6,12 +6,12 @@
         :search-input.sync="search"
         :menu-props="{ closeOnContentClick: true }"
         :filter="customFilter"
-        :solo="solo"
         v-model="chosen"
         @focus="focused = true"
         @blur="focused = false"
         return-object
         hide-details
+        solo
     )
         template(v-slot:item="{ item }")
             b(v-if="item.title") {{ item.text }}
@@ -23,7 +23,7 @@
 <script>
 
     export default {
-        props: ["value", "items", "label", "solo"],
+        props: ["value", "items", "label"],
         data() {
             return {
                 search: "",

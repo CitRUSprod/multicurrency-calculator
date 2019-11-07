@@ -1,95 +1,51 @@
 <template lang="pug">
     
     .calculation-list
-        v-dialog(
-            max-width="300"
-            v-model="resultSettings.dialog"
-            persistent
-        )
-            v-card
-                v-card-title.headline.primary.white--text Result settings
-                v-card-text
-                    v-row
-                        v-col(cols="12")
-                            app-search-menu(
-                                label="Currency"
-                                :items="currencies"
-                                v-model="resultSettings.currency"
-                            )
-                    v-row
-                        v-col(cols="12")
-                            v-text-field.title(
-                                label="Precision"
-                                v-model.number="resultSettings.precision"
-                                hide-details
-                            )
-                v-card-actions
-                    v-spacer
-                    v-btn(
-                        color="success"
-                        @click="saveResultSettings"
-                        text
-                    ) Save
-                    v-btn(
-                        color="error"
-                        @click="cancelResultSettings"
-                        text
-                    ) Cancel
         .inner
-            .pb-4
-                v-card(
-                    color="primary"
-                    height="100%"
-                )
-                    v-card-text.fill-height
-                        v-card.scrollable(height="100%")
-                            v-card-text.fill-height
-                                .fill-height.d-flex.justify-center.align-center(v-if="!wallets.length")
-                                    .body-1.font-italic Wallet list is empty
-                                v-card(
-                                    v-else
-                                    v-for="wallet, index in wallets"
-                                    :key="index"
-                                    :class="index + 1 === wallets.length ? 'mb-4' : 'mb-2'"
-                                    :color="walletColor(index, wallet.sign)"
-                                )
-                                    v-card-text
-                                        .wallet
-                                            .information
-                                                .subtitle-1.font-weight-bold {{ wallet.amount }} {{ wallet.currency.text }}
-                                                .caption.font-italic(v-if="!!wallet.note") {{ wallet.note }}
-                                            .control.pl-2
-                                                div
-                                                    v-icon.mr-2(
-                                                        :disabled="editingMode"
-                                                        @click="editWallet(index)"
-                                                        small
-                                                    ) fas fa-pen
-                                                    v-icon(
-                                                        :disabled="editingMode"
-                                                        @click="removeWallet(index)"
-                                                        small
-                                                    ) fas fa-trash
-            div
-                v-card(
-                    color="primary"
-                    height="100%"
-                )
-                    v-card-text
-                        v-text-field.title(
-                            append-icon="fas fa-cog"
-                            :prefix="currency ? `${currency.text} ` : void 0"
-                            v-model="sum"
-                            @click:append="resultSettings.dialog = true"
-                            hide-details
-                            readonly
-                            solo
-                        )
-                        app-search-menu(
-                            :items="currencies"
-                            v-model="currency"
-                            style="display:none"
-                        )
+            v-card(
+                color="primary"
+                height="100%"
+            )
+                v-card-text.grid
+                    v-card.scrollable(height="100%")
+                        v-card-text.fill-height
+                            .fill-height.d-flex.justify-center.align-center(v-if="!wallets.length")
+                                .body-1.font-italic Wallet list is empty
+                            v-card(
+                                v-else
+                                v-for="wallet, index in wallets"
+                                :key="index"
+                                :class="index + 1 === wallets.length ? 'mb-4' : 'mb-2'"
+                                :color="walletColor(index, wallet.sign)"
+                            )
+                                v-card-text
+                                    .wallet
+                                        .information
+                                            .subtitle-1.font-weight-bold {{ amountToString(wallet.amount) }} {{ wallet.currency.text }}
+                                            .caption.font-italic(v-if="!!wallet.note") {{ wallet.note }}
+                                        .control.pl-2
+                                            div
+                                                v-icon.mr-2(
+                                                    :disabled="cpMode !== 'wallet-adding'"
+                                                    @click="editWallet(index)"
+                                                    small
+                                                ) fas fa-pen
+                                                v-icon(
+                                                    :disabled="cpMode !== 'wallet-adding'"
+                                                    @click="removeWallet(index)"
+                                                    small
+                                                ) fas fa-trash
+                    v-text-field.title(
+                        :prefix="currency ? `${currency.text} ` : void 0"
+                        :value="amountToString(sum)"
+                        :disabled="cpMode !== 'wallet-adding'"
+                        @click:append="cpMode = 'result-settings'"
+                        append-icon="fas fa-cog"
+                        hide-details
+                        readonly
+                        solo
+                    )
+                        
 
 </template>
 
@@ -99,32 +55,27 @@
     import Decimal from "decimal.js-light"
 
     import Converter from "@/libs/converter"
-    import AppSearchMenu from "@/components/search-menu.vue"
-
+    
 
     export default {
-        components: {
-            AppSearchMenu
-        },
         data() {
             return {
-                resultSettings: {
-                    dialog: false,
-                    precision: 4,
-                    currency: null
-                }
+                editableWallet: -1
             }
         },
         computed: {
-            ...vp.sync("settings", ["precision", "currency"]),
+            ...vp.get("settings", ["precision", "currency"]),
+            ...vp.sync("currencies", ["wallets"]),
             ...vp.get("currencies", {
-                currencies: "list",
                 rates: "rates"
             }),
-            ...vp.sync("currencies", ["wallets"]),
-            ...vp.sync("editing", {
-                editingMode: "mode",
-                editingParams: "params"
+            ...vp.sync("cp", {
+                cpMode: "mode",
+                cpAmount: "amount",
+                cpSign: "sign",
+                cpCurrency: "currency",
+                cpNote: "note",
+                cpSaved: "saved"
             }),
             sum() {
                 if (this.currency) {
@@ -150,53 +101,41 @@
             }
         },
         watch: {
-            precision(v) {
-                this.resultSettings.precision = v
-            },
-            currency(v) {
-                this.resultSettings.currency = v
-            },
-            editingMode(v) {
-                if (!v && _.isNumber(this.editingParams.index)) {
-                    const { index, sign, amount, currency, note } = _.cloneDeep(this.editingParams)
-                    const wallet = { sign, amount, currency, note }
-                    if (!_.isEqual(this.wallets[index], wallet)) {
+            cpMode(val, oldVal) {
+                if (oldVal === "wallet-editing" && val === "wallet-adding" && this.cpSaved) {
+                    this.cpSaved = false
+                    const wallet = {
+                        sign: this.cpSign,
+                        amount: +this.cpAmount.replace(",", "."),
+                        currency: this.cpCurrency,
+                        note: this.cpNote
+                    }
+                    if (!_.isEqual(this.wallets[this.editableWallet], wallet)) {
                         const wallets = _.cloneDeep(this.wallets)
-                        wallets[index] = wallet
+                        wallets[this.editableWallet] = wallet
                         this.wallets = wallets
-                        this.editingParams = {
-                            index: null,
-                            sign: null,
-                            amount: null,
-                            currency: null,
-                            note: null
-                        }
                     }
                 }
             }
         },
         methods: {
-            saveResultSettings() {
-                this.precision = this.resultSettings.precision
-                this.currency = this.resultSettings.currency
-                this.resultSettings.dialog = false
-            },
-            cancelResultSettings() {
-                this.resultSettings.precision = this.precision
-                this.resultSettings.currency = this.currency
-                this.resultSettings.dialog = false
+            amountToString(amount) {
+                return amount.toString().replace(".", ",")
             },
             editWallet(index) {
                 const wallet = _.cloneDeep(this.wallets[index])
-                wallet.index = index
-                this.editingParams = wallet
-                this.editingMode = true
+                this.editableWallet = index
+                this.cpAmount = this.amountToString(wallet.amount)
+                this.cpSign = wallet.sign
+                this.cpCurrency = wallet.currency
+                this.cpNote = wallet.note
+                this.cpMode = "wallet-editing"
             },
             removeWallet(index) {
                 this.wallets.splice(index, 1)
             },
             walletColor(index, sign) {
-                if (this.editingMode && index !== this.editingParams.index) {
+                if (this.cpMode === "wallet-editing" && index !== this.editableWallet) {
                     return sign ? "grey" : "grey darken-1"
                 } else {
                     return sign ? "success" : "error"
@@ -216,10 +155,15 @@
 
         > .inner
             position: absolute
-            display: grid
-            grid-template-columns: 1fr
-            grid-template-rows: minmax(0, 1fr) auto
+            width: 100%
             height: 100%
+
+            .grid
+                display: grid
+                grid-template-columns: 1fr
+                grid-template-rows: minmax(0, 1fr) auto
+                grid-row-gap: 16px
+                height: 100%
 
             .scrollable
                 overflow-y: auto

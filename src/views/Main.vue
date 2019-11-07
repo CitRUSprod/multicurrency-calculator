@@ -62,7 +62,7 @@
             v-container.py-0.fill-height(fluid)
                 v-row.fill-height
                     v-col.pr-2(cols="6")
-                        app-wallet-editor
+                        app-control-panel
                     v-col.pl-2(cols="6")
                         app-calculation-list
 
@@ -71,13 +71,13 @@
 
 <script>
 
-    import AppWalletEditor from "@/components/wallet-editor.vue"
+    import AppControlPanel from "@/components/control-panel.vue"
     import AppCalculationList from "@/components/calculation-list.vue"
     import AppListItem from "@/components/list-item.vue"
 
     export default {
         components: {
-            AppWalletEditor,
+            AppControlPanel,
             AppCalculationList,
             AppListItem
         },
