@@ -4,6 +4,8 @@ const state = {
     amount: "0",
     currency: null,
     note: "",
+    operationAmount: "0",
+    operationSign: "+%",
     saved: false
 }
 

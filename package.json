@@ -25,7 +25,7 @@
         "@vue/cli-plugin-babel": "^4.0.5",
         "@vue/cli-service": "^4.0.5",
         "electron": "5.0.12",
-        "electron-localshortcut": "^3.1.0",
+        "electron-localshortcut": "^3.2.0",
         "pug": "^2.0.4",
         "pug-plain-loader": "^1.0.0",
         "sass": "^1.23.3",

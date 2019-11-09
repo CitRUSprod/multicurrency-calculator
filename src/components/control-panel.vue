@@ -69,6 +69,35 @@
                         reverse
                         solo
                     )
+            template(v-else-if="cpMode === 'operation-adding'")
+                .mb-3
+                    v-text-field.display-1(
+                        :value="operationAmount"
+                        :append-icon="operationIcon"
+                        :prepend-inner-icon="cpOperationSign === '+%' || cpOperationSign === '-%' ? 'fas fa-percent' : void 0"
+                        @click:append="changeOperationSign"
+                        hide-details
+                        readonly
+                        reverse
+                        solo
+                    )
+                div
+                    v-row(
+                        v-for="btnRow, index in buttons"
+                        :key="index"
+                    )
+                        v-col(
+                            v-for="btn, i in btnRow"
+                            :key="i"
+                            :cols="12 / btnRow.length"
+                        )
+                            v-btn.display-1(
+                                color="secondary"
+                                @click="btn.click"
+                                large
+                                block
+                            )
+                                component(:is="btn.icon ? 'v-icon' : 'span'") {{ btn.text }}
         v-card-actions.px-4.pb-4
             v-btn(
                 v-if="cpMode === 'wallet-adding'"
@@ -104,6 +133,23 @@
                         @click="saveResultSettings"
                         block
                     ) Save
+                v-col.pl-2(cols="6")
+                    v-btn(
+                        color="error"
+                        @click="cancel"
+                        block
+                    ) Cancel
+            v-row(
+                v-else-if="cpMode === 'operation-adding'"
+                no-gutters
+            )
+                v-col.pr-2(cols="6")
+                    v-btn(
+                        color="success"
+                        :disabled="!operationAmountNum"
+                        @click="addOperation"
+                        block
+                    ) Add
                 v-col.pl-2(cols="6")
                     v-btn(
                         color="error"
@@ -207,6 +253,8 @@
                 cpSign: "sign",
                 cpCurrency: "currency",
                 cpNote: "note",
+                cpOperationAmount: "operationAmount",
+                cpOperationSign: "operationSign",
                 cpSaved: "saved"
             }),
             ...vp.sync("currencies", ["wallets"]),
@@ -218,6 +266,7 @@
                     case "wallet-adding": return "Wallet adding"
                     case "wallet-editing": return "Wallet editing"
                     case "result-settings": return "Result settings"
+                    case "operation-adding": return "Operation adding"
                 }
             },
             amount: {
@@ -225,26 +274,7 @@
                     return this.cpAmount
                 },
                 set(v) {
-                    if (!_.isString(v) || !v) {
-                        this.cpAmount = "0"
-                    } else {
-                        if (v.replace(/[^,]/g, "").length <= 1) {
-                            if (v[0] === "0" && v.length > 1) {
-                                const str = v.replace(/^0*/, "")
-                                if (str.length) {
-                                    if (str[0] === ",") {
-                                        this.cpAmount = `0${str}`
-                                    } else {
-                                        this.cpAmount = str
-                                    }
-                                } else {
-                                    this.cpAmount = "0"
-                                }
-                            } else {
-                                this.cpAmount = v
-                            }
-                        }
-                    }
+                    this.setAmountSetter("cpAmount", v)
                 }
             },
             amountNum() {
@@ -256,6 +286,26 @@
                 } else {
                     return " 0 "
                 }
+            },
+            operationIcon() {
+                const icons = {
+                    "+%": "plus",
+                    "-%": "minus",
+                    "*": "times",
+                    "/": "divide"
+                }
+                return `fas fa-${icons[this.cpOperationSign]}`
+            },
+            operationAmount: {
+                get() {
+                    return this.cpOperationAmount
+                },
+                set(v) {
+                    this.setAmountSetter("cpOperationAmount", v)
+                }
+            },
+            operationAmountNum() {
+                return +this.operationAmount.replace(",", ".")
             }
         },
         watch: {
@@ -267,17 +317,49 @@
             }
         },
         methods: {
+            setAmountSetter(key, v) {
+                if (!_.isString(v) || !v) {
+                    this[key] = "0"
+                } else {
+                    if (v.replace(/[^,]/g, "").length <= 1) {
+                        if (v[0] === "0" && v.length > 1) {
+                            const str = v.replace(/^0*/, "")
+                            if (str.length) {
+                                if (str[0] === ",") {
+                                    this[key] = `0${str}`
+                                } else {
+                                    this[key] = str
+                                }
+                            } else {
+                                this[key] = "0"
+                            }
+                        } else {
+                            this[key] = v
+                        }
+                    }
+                }
+            },
             addSymbol(symbol) {
-                this.amount += symbol
+                if (this.cpMode === "wallet-adding" || this.cpMode === "wallet-editing") {
+                    this.amount += symbol
+                } else if ("operation-adding") {
+                    this.operationAmount += symbol
+                }
             },
             removeSymbol() {
-                this.amount = this.amount.substr(0, this.amount.length - 1)
+                if (this.cpMode === "wallet-adding" || this.cpMode === "wallet-editing") {
+                    this.amount = this.amount.substr(0, this.amount.length - 1)
+                } else if ("operation-adding") {
+                    this.operationAmount = this.operationAmount.substr(0, this.operationAmount.length - 1)
+                }
             },
             setDefaultValues() {
                 this.$nextTick(() => {
                     this.cpSign = true
                     this.cpAmount = "0"
                     this.cpNote = ""
+                    this.cpOperationSign = "+%"
+                    this.cpOperationAmount = "0"
                     this.resultPrecision = this.precision
                     this.resultCurrency = this.currency
                 })
@@ -291,9 +373,12 @@
                     sign: this.cpSign,
                     amount: this.amountNum,
                     currency: this.cpCurrency,
-                    note: this.cpNote
+                    note: this.cpNote,
+                    operation: null
                 }
-                this.wallets.push(wallet)
+                const wallets = _.cloneDeep(this.wallets)
+                wallets.push(wallet)
+                this.wallets = wallets
                 this.setDefaultValues()
             },
             editWallet() {
@@ -309,6 +394,16 @@
             saveResultSettings() {
                 this.precision = this.resultPrecision
                 this.currency = this.resultCurrency
+                this.cancel()
+            },
+            changeOperationSign() {
+                const signs = ["+%", "-%", "*", "/"]
+                let index = signs.indexOf(this.cpOperationSign) + 1
+                if (index === signs.length) index = 0
+                this.cpOperationSign = signs[index]
+            },
+            addOperation() {
+                this.cpSaved = true
                 this.cancel()
             }
         }
