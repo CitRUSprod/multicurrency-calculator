@@ -27,6 +27,7 @@
                         )
                             v-list-item-content
                                 v-list-item-title 1 USD = {{ rates[curr.text] }} {{ curr.text }}
+                v-divider
                 v-card-actions
                     v-spacer
                     v-btn(
@@ -39,6 +40,41 @@
                         color="error"
                         :loading="gettingRates"
                         @click="ratesDialog = false"
+                        text
+                    ) Close
+        v-dialog(
+            max-width="400"
+            v-model="infoDialog"
+            persistent
+            scrollable
+        )
+            v-card
+                v-card-title.headline.primary.white--text Info
+                v-card-text
+                    v-list(dense)
+                        v-list-item.subtitle-1.px-0
+                            b.mr-2 Name:
+                            | Multicurrency Calculator
+                        v-list-item.subtitle-1.px-0
+                            b.mr-2 Version:
+                            | 0.0.1
+                        v-list-item.subtitle-1.px-0
+                            b.mr-2 Developer:
+                            | CitRUS
+                        v-list-item.subtitle-1.px-0
+                            b.mr-2 GitHub:
+                            i
+                                a(
+                                    href="#"
+                                    @click.prevent="openGithub"
+                                ) LINK
+                v-divider
+                v-card-actions
+                    v-spacer
+                    v-btn(
+                        color="error"
+                        :loading="gettingRates"
+                        @click="infoDialog = false"
                         text
                     ) Close
         v-navigation-drawer.elevation-2(
@@ -58,6 +94,11 @@
                     icon="fas fa-search-dollar"
                     :click="() => { ratesDialog = true }"
                 )
+                app-list-item(
+                    tooltip="Info"
+                    icon="fas fa-info-circle"
+                    :click="() => { infoDialog = true }"
+                )
         v-content
             v-container.py-0.fill-height(fluid)
                 v-row.fill-height
@@ -71,9 +112,12 @@
 
 <script>
 
+    import { ipcRenderer } from "electron"
+
     import AppControlPanel from "@/components/control-panel.vue"
     import AppCalculationList from "@/components/calculation-list.vue"
     import AppListItem from "@/components/list-item.vue"
+
 
     export default {
         components: {
@@ -84,7 +128,8 @@
         data() {
             return {
                 gettingRates: false,
-                ratesDialog: false
+                ratesDialog: false,
+                infoDialog: false
             }
         },
         computed: {
@@ -130,6 +175,9 @@
                     console.error(res.error)
                 }
                 this.gettingRates = false
+            },
+            openGithub() {
+                ipcRenderer.send("open-in-browser", "https://github.com/CitRUSprod/multicurrency-calculator")
             }
         },
         async mounted() {

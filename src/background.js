@@ -1,4 +1,4 @@
-import { app } from "electron"
+import { app, ipcMain, shell } from "electron"
 import axios from "axios"
 
 import { createWindow, createStorage, msgServe } from "./init/main"
@@ -33,6 +33,11 @@ app.on("ready", async () => {
 })
 
 
+ipcMain.on("open-in-browser", (e, url) => {
+    shell.openExternal(url)
+})
+
+
 msgServe("get-settings", async () => {
     return await storageData.getJson("settings.json")
 })
@@ -44,11 +49,19 @@ msgServe("set-settings", async settings => {
 
 
 msgServe("get-rates", async () => {
-    const res = await axios.get("https://min-api.cryptocompare.com/data/pricemulti", {
-        params: {
-            fsyms: "USD",
-            tsyms: [...currencies.fiat, ...currencies.crypto].join(",")
-        }
-    })
-    return res.data.USD
+    const chunkSize = 10
+    const chunks = _.chunk([...currencies.fiat, ...currencies.crypto], chunkSize)
+    const result = {}
+
+    for (const chunk of chunks) {
+        const res = await axios.get("https://min-api.cryptocompare.com/data/pricemulti", {
+            params: {
+                fsyms: "USD",
+                tsyms: chunk.join(",")
+            }
+        })
+        _.assign(result, res.data.USD)
+    }
+
+    return result
 })

@@ -51,7 +51,7 @@
                                                     x-small
                                                     text
                                                 ) + Operation
-                                            .caption.font-weight-bold(v-else) = {{ amountToString(applyOperationToWallet(wallet)) }} {{ wallet.currency.text }}
+                                            .caption.font-weight-bold(v-else) = {{ amountToString(applyOperationToWallet(wallet), true) }} {{ wallet.currency.text }}
                                         .control.pl-4
                                             div
                                                 v-icon.mr-2(
@@ -66,7 +66,7 @@
                                                 ) fas fa-trash
                     v-text-field.title(
                         :prefix="currency ? `${currency.text} ` : void 0"
-                        :value="amountToString(sum)"
+                        :value="amountToString(sum, true)"
                         :disabled="cpMode !== 'wallet-adding'"
                         @click:append="cpMode = 'result-settings'"
                         append-icon="fas fa-cog"
@@ -181,8 +181,12 @@
             }
         },
         methods: {
-            amountToString(amount) {
-                return _.round(amount, this.precision).toString().replace(".", ",")
+            amountToString(amount, round = false) {
+                if (round) {
+                    return _.round(amount, this.precision).toString().replace(".", ",")
+                } else {
+                    return amount.toString().replace(".", ",")
+                }
             },
             editWallet(index) {
                 const wallet = _.cloneDeep(this.wallets[index])
