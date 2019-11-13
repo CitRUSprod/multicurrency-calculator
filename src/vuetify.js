@@ -4,7 +4,7 @@ import colors from "vuetify/lib/util/colors"
 import en from "vuetify/es5/locale/en"
 
 import "vuetify/dist/vuetify.min.css"
-import "material-design-icons-iconfont/dist/material-design-icons.css"
+import "@fortawesome/fontawesome-free/css/all.css"
 
 
 Vue.use(Vuetify)
@@ -16,14 +16,14 @@ export default new Vuetify({
         current: "en"
     },
     icons: {
-        iconfont: "md"
+        iconfont: "fa"
     },
     theme: {
         dark: false,
         themes: {
             light: {
-                primary: colors.amber.darken2,
-                secondary: colors.amber.lighten2
+                primary: colors.cyan.darken2,
+                secondary: colors.cyan.base
             },
             dark: {
                 primary: colors.teal.darken3,

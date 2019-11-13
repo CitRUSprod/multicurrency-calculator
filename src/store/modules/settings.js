@@ -1,5 +1,10 @@
 const state = {
-    dark: false
+    dark: false,
+    precision: 4,
+    currency: {
+        text: "USD",
+        value: "usd"
+    }
 }
 
 
