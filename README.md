@@ -1,5 +1,7 @@
 # Multicurrency Calculator
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/CitRUSprod/multicurrency-calculator.svg)](https://greenkeeper.io/)
+
 ## Installation:
 
 ```bash
