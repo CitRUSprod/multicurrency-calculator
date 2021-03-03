@@ -26,7 +26,7 @@
         "@vue/cli-service": "^4.0.5",
         "electron": "5.0.12",
         "electron-localshortcut": "^3.2.1",
-        "pug": "^2.0.4",
+        "pug": "^3.0.1",
         "pug-plain-loader": "^1.0.0",
         "sass": "^1.23.3",
         "sass-loader": "^8.0.0",
